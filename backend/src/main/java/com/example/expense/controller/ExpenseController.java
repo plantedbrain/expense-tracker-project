@@ -1,11 +1,12 @@
 package com.example.expense.controller;
 import com.example.expense.model.Expense;
 import com.example.expense.service.ExpenseService;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@RestController @RequestMapping("/api/expenses") @RequiredArgsConstructor
+@RestController @RequestMapping("/api/expenses") @AllArgsConstructor
 @CrossOrigin(origins="*")
 public class ExpenseController {
  private final ExpenseService svc;
