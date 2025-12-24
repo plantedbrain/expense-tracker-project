@@ -32,7 +32,18 @@ public class ExpenseService {
         item.put("amount", AttributeValue.builder().n(e.getAmount().toString()).build());
         item.put("date", AttributeValue.builder().s(e.getDate()).build());
         dynamo.putItem(PutItemRequest.builder().tableName(table).item(item).build());
-        //sns.publish(PublishRequest.builder().topicArn(topic).message("New expense: "+e.getTitle()).build());
+        sns.publish(PublishRequest.builder()
+                .topicArn(topic)
+                .subject("New Expense Created")
+                .message(
+                        "A new expense has been created:\n\n" +
+                                "Title: " + e.getTitle() + "\n" +
+                                "Amount: " + e.getAmount() + "\n" +
+                                "Date: " + e.getDate()
+                )
+                .build()
+        );
+
         return e;
     }
 
