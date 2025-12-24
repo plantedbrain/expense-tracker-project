@@ -12,6 +12,7 @@
     <groupId>com.example</groupId>
     <artifactId>expense-tracker</artifactId>
     <version>1.0.0</version>
+    <packaging>jar</packaging>
     <name>expense-tracker</name>
 
     <properties>
@@ -54,13 +55,16 @@
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>sns</artifactId>
         </dependency>
-
-        <!-- Lombok (Optional but convenient) -->
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <optional>true</optional>
-        </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
 
 </project>

@@ -1,2 +1,7 @@
+com\example\expense\config\CorsConfig.class
+com\example\expense\controller\ExpenseController.class
 com\example\expense\config\AwsConfig.class
+com\example\expense\service\ExpenseService.class
 com\example\expense\ExpenseTrackerApplication.class
+com\example\expense\model\Expense.class
+com\example\expense\config\CorsConfig$1.class

@@ -1,7 +1,6 @@
 package com.example.expense.service;
 
 import com.example.expense.model.Expense;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.services.dynamodb.*;
@@ -12,7 +11,6 @@ import software.amazon.awssdk.services.sns.model.*;
 import java.util.*;
 
 @Service
-@RequiredArgsConstructor
 public class ExpenseService {
 
     private final DynamoDbClient dynamo;
@@ -23,6 +21,11 @@ public class ExpenseService {
 
     @Value("${aws.sns.topicArn}")
     String topic;
+
+    public ExpenseService(DynamoDbClient dynamo, SnsClient sns) {
+        this.dynamo = dynamo;
+        this.sns = sns;
+    }
 
     public Expense create(Expense e) {
         e.setExpenseId(UUID.randomUUID().toString());
