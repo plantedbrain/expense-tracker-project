@@ -1,130 +1,93 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
+const API = process.env.REACT_APP_API_URL + "/api/expenses";
+
 export default function App() {
+  const [expenses, setExpenses] = useState([]);
   const [title, setTitle] = useState("");
   const [amount, setAmount] = useState("");
+  const [date, setDate] = useState("");
   const [msg, setMsg] = useState("");
-  const [expenses, setExpenses] = useState([]);
 
-  const [sortColumn, setSortColumn] = useState("date");
-  const [sortOrder, setSortOrder] = useState("desc"); // default: latest first
-
-  const API = process.env.REACT_APP_API_URL + "/expenses";
-
-  const loadExpenses = async () => {
-    const res = await axios.get(API);
-    setExpenses(res.data);
-  };
-
+  // ✅ LOAD EXPENSES ON PAGE LOAD
   useEffect(() => {
-    loadExpenses();
+    fetchExpenses();
   }, []);
 
+  const fetchExpenses = async () => {
+    try {
+      const res = await axios.get(API);
+      setExpenses(res.data);
+    } catch (err) {
+      console.error(err);
+      setMsg("Failed to load expenses");
+    }
+  };
+
   const submit = async () => {
-    const res = await axios.post(API, {
-      title,
-      amount: parseFloat(amount),
-      date: new Date().toISOString().substring(0, 10),
-    });
+    try {
+      await axios.post(API, {
+        title,
+        amount: parseFloat(amount),
+        date
+      });
 
-    setMsg("Created: " + res.data.expenseId);
-    setTitle("");
-    setAmount("");
-    loadExpenses();
-  };
+      setTitle("");
+      setAmount("");
+      setDate("");
+      setMsg("Expense added");
 
-  // 🔹 Handle column sort click
-  const sortBy = (column) => {
-    if (sortColumn === column) {
-      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
-    } else {
-      setSortColumn(column);
-      setSortOrder("asc");
+      // ✅ REFRESH TABLE AFTER SAVE
+      fetchExpenses();
+    } catch (err) {
+      console.error(err);
+      setMsg("Error saving expense");
     }
   };
-
-  // 🔹 Sort logic
-  const sortedExpenses = [...expenses].sort((a, b) => {
-    let valA = a[sortColumn];
-    let valB = b[sortColumn];
-
-    // Numeric sort for amount
-    if (sortColumn === "amount") {
-      valA = Number(valA);
-      valB = Number(valB);
-    }
-
-    // String comparison works for title & date (YYYY-MM-DD)
-    if (valA < valB) return sortOrder === "asc" ? -1 : 1;
-    if (valA > valB) return sortOrder === "asc" ? 1 : -1;
-    return 0;
-  });
-
-  // Arrow indicator
-  const arrow = (col) =>
-    sortColumn === col ? (sortOrder === "asc" ? " ▲" : " ▼") : "";
-
-  const deleteExpense = async (id) => {
-  if (!window.confirm("Delete this expense?")) return;
-
-  await axios.delete(API + "/" + id);
-  loadExpenses(); // refresh table
-  };
-
 
   return (
     <div style={{ padding: 20 }}>
       <h2>Expense Tracker</h2>
 
-      {/* Create expense */}
       <input
         placeholder="Title"
         value={title}
-        onChange={(e) => setTitle(e.target.value)}
+        onChange={e => setTitle(e.target.value)}
       />
-
       <input
+        type="number"
         placeholder="Amount"
         value={amount}
-        onChange={(e) => setAmount(e.target.value)}
+        onChange={e => setAmount(e.target.value)}
+      />
+      <input
+        type="date"
+        value={date}
+        onChange={e => setDate(e.target.value)}
       />
 
       <button onClick={submit}>Save</button>
-
       <p>{msg}</p>
 
       <hr />
 
-      {/* Expenses table */}
       <h3>Expenses</h3>
 
-      <table border="1" cellPadding="6">
+      <table border="1" cellPadding="8">
         <thead>
           <tr>
-            <th style={{ cursor: "pointer" }} onClick={() => sortBy("title")}>
-              Title{arrow("title")}
-            </th>
-            <th style={{ cursor: "pointer" }} onClick={() => sortBy("amount")}>
-              Amount{arrow("amount")}
-            </th>
-            <th style={{ cursor: "pointer" }} onClick={() => sortBy("date")}>
-              Date{arrow("date")}
-            </th>
-            <th>Actions</th>
+            <th>Title</th>
+            <th>Amount</th>
+            <th>Date</th>
           </tr>
         </thead>
         <tbody>
-          {sortedExpenses.map((e) => (
+          {expenses.map(e => (
             <tr key={e.expenseId}>
               <td>{e.title}</td>
               <td>{e.amount}</td>
               <td>{e.date}</td>
-              <td>
-                <button onClick={() => deleteExpense(e.expenseId)}>
-                  Delete
-                </button>
-              </td>
             </tr>
           ))}
         </tbody>
